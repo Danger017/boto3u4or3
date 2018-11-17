@@ -8,11 +8,69 @@ var jimp = require('jimp');
 const dateFormat = require('dateformat');
 let points = JSON.parse(fs.readFileSync(`./points.json`, `utf8`))
 var ownerid = '455331653309562910';
+var dat = JSON.parse("{}");
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
 client.user.setActivity('Human .. Online', {type:'idle' });
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
+client.on("ready", () => {
+    var guild;
+    while (!guild)
+        guild = client.guilds.find("name", 'Fucck Off..')
+    guild.fetchInvites().then((data) => {
+        data.forEach((Invite, key, map) => {
+            var Inv = Invite.code;
+            dat[Inv] = Invite.uses;
+        })
+    })
+    console.log(`Ready!`)
+})
+client.on("guildMemberAdd", (member) => {
+
+    let channel = member.guild.channels.find('name', 'welcome');
+    if (!channel) {
+        console.log("!channel fails");
+        return;
+    }
+    if (member.user.id == client.user.id) {
+        return;
+    }
+    var guild;
+    while (!guild)
+        guild = client.guilds.find("name", 'Fucck Off..')
+    guild.fetchInvites().then((data) => {
+        data.forEach((Invite, key, map) => {
+            var Inv = Invite.code;
+            if (dat[Inv])
+                if (dat[Inv] < Invite.uses) {
+                    console.log(`${member.user.username} joined over ${Invite.inviter.username}'s invite ${Invite.url}`)
+                    const millis = new Date().getTime() - member.user.createdAt.getTime();
+                    const now = new Date();
+                    dateFormat(now, 'dddd, mmmm dS, yyyy, h:MM:ss TT');
+                    const verificationLevels = ['None', 'Low', 'Medium', 'Insane', 'Extreme'];
+                    const days = millis / 1000 / 60 / 60 / 24;
+                    let memberavatar = member.user.avatarURL
+
+                    var embed = new Discord.RichEmbed()
+                        .setColor('000000')
+                        .setAuthor(`${member.user.username}`, `${member.guild.iconURL}`)
+                        .setThumbnail(memberavatar)
+                        .setDescription(`**عضو جديد !**
+**<@!${member.id}>**
+**Days In Discord : ${days.toFixed(0)}**
+**Invited By : <@!${Invite.inviter.id}>**
+**Members invited : ${Invite.uses}**
+**Total Members : ${member.guild.memberCount}**
+    `)
+                        .setFooter(`${member.user.username}`, memberavatar)
+                    channel.send(embed)
+                }
+            dat[Inv] = Invite.uses;
+        })
+    })
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('message', message => {
