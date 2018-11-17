@@ -8,7 +8,6 @@ var jimp = require('jimp');
 const dateFormat = require('dateformat');
 let points = JSON.parse(fs.readFileSync(`./points.json`, `utf8`))
 var ownerid = '455331653309562910';
-var shortNumber = require('short-number');
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
