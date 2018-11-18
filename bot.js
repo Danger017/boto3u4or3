@@ -455,8 +455,6 @@ client.on('voiceStateUpdate', async (oldM, newM) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //Games
 client.on("message", message => {
-    let prechannel = ['511306000725442602']
-    if (!prechannel.includes(message.channel.id)) return
     if (!message.channel.guild) return;
 
     if (message.content.startsWith(prefix + '3wasm')) {
@@ -751,7 +749,7 @@ client.on("message", message => {
             .setDescription(`
     **
     
-    Prefix = '!',
+    Prefix = '${prefix}',
     اوامر الالعاب,
     
     اول واحد يجاوب ياخذ النقاط,
