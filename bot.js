@@ -9,6 +9,10 @@ const dateFormat = require('dateformat');
 let points = JSON.parse(fs.readFileSync(`./points.json`, `utf8`))
 var ownerid = '455331653309562910';
 var dat = JSON.parse("{}");
+var report = JSON.parse(fs.readFileSync(`./Database/report.json`, `utf8`));
+let prefixes = JSON.parse(fs.readFileSync("./Database/prefix.json", "utf8"));
+var r = JSON.parse(fs.readFileSync('./Database/rchannel.json'));
+var uc = JSON.parse(fs.readFileSync('./Database/uchannel.json'));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
@@ -969,4 +973,135 @@ client.on("message", message => {
     }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
+client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: '!',
+    }
+    var prefix = prefixes[message.guild.id].prefix
+    if (!message.channel.guild) return;
+    let args = message.content.split(" ").slice(1);
+
+    if (!r[message.guild.id]) r[message.guild.id] = {
+        channel: 'reports',
+        onoff: 'Off'
+    }
+
+    if (message.content.startsWith(prefix + `report`)) {
+        if (!message.mentions.members.first()) return message.reply(`**:x: Error: You must type the person's mention.**`)
+        if (!report[message.mentions.users.first().id]) report[message.mentions.users.first().id] = {
+            rcase: 0,
+        }
+        var reports = report[message.mentions.users.first().id];
+        var creports = r[message.guild.id];
+        if (report[message.mentions.users.first().id].rcase == '3') return message.reply(`**:x: Error: This person has already been reported 3 times**`)
+        if (message.mentions.users.first() === message.author) return message.channel.send(`**:x: Error: You can not report yourself.**`);
+        if (message.mentions.users.first() === client.user) return message.channel.send(`**:x: Error: You can not report me !**`);
+
+        if (r[message.guild.id].onoff === 'Off') return message.channel.send(`**:x: Error: Reports channel property is disabled, Tell administrators to activate the Feature by command: ${prefix}creport toggle **`)
+
+        if (!args[1]) return message.reply(`**:x: Error: You must write a report message.**`)
+        var embed = new Discord.RichEmbed();
+        embed.setThumbnail(`${message.author.avatarURL}`)
+        embed.setAuthor(message.author.username, message.author.avatarURL)
+        embed.setDescription(`**The person mentioned: ${message.mentions.members.first()}
+By : ${message.member}
+Reason : ${args[1]}**`)
+        embed.setFooter(`Case number: ${reports.rcase+1}`)
+        if (message.guild.channels.find('name', creports.channel)) {
+            message.guild.channels.find('name', creports.channel).send(embed);
+        } else return message.reply(`noreply`);
+    }
+    fs.writeFile('./Database/report.json', JSON.stringify(report), (err) => {
+        if (err) console.error(err)
+    });
+
+    fs.writeFile('./Database/rchannel.json', JSON.stringify(r), (err) => {
+        if (err) console.error(err)
+    });
+
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
+
+});
+
+//Creport
+client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: '!',
+    }
+    var prefix = prefixes[message.guild.id].prefix
+    if (!message.channel.guild) return;
+    if (message.author.bot) return;
+    var info = r[message.guild.id];
+    if (!r[message.guild.id]) r[message.guild.id] = {
+        channel: 'reports',
+        onoff: 'Off'
+    }
+   
+    
+    var sender = message.author;
+    if (message.content.startsWith(prefix + 'creport')) {
+        if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.reply(`**:x: Error: You do not have the required permissions: Manage Server.**`)
+        if (!message.guild.member(client.user).hasPermission('MANAGE_GUILD')) return message.reply('**:x: Error: I dont have the required permissions : MANAGE_GUILD**').catch(console.error);
+        let args = message.content.split(" ").slice(1)
+        let state = args[0]
+        if (!args[0]) return message.reply(`**${prefix}creport toggle/setchannel [channel_name]**`)
+        if (!state.trim().toLowerCase() == 'toggle' || !state.trim().toLowerCase() == 'setchannel') return message.reply(`**Please type a right state, ${prefix}creport toggle/setchannel [channel_name]**`)
+        if (state.trim().toLowerCase() == 'toggle') {
+            if (r[message.guild.id].onoff === 'Off') return [message.channel.send(`**The report channel feature has been activated**`), r[message.guild.id].onoff = 'On']
+            if (r[message.guild.id].onoff === 'On') return [message.channel.send(`**The report channel feature has been deactivated**`), r[message.guild.id].onoff = 'Off']
+        }
+        if (state.trim().toLowerCase() == 'setchannel') {
+            let newChannel = message.content.split(" ").slice(2).join(" ")
+            if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}report setchannel [channel_name]**`)
+            if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`)
+            r[message.guild.id].channel = newChannel
+            message.channel.send(`** The report channel role has been changed to :  #${newChannel}**`)
+        }
+    }
+    fs.writeFile("./Database/rchannel.json", JSON.stringify(r), (err) => {
+        if (err) console.error(err)
+    });
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
+
+});
+//SetPrefix
+client.on("message", message => {
+    if (!message.channel.guild) return;
+    if (message.author.bot) return;
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: '!',
+    }
+    var prefix = prefixes[message.guild.id].prefix
+    var setp = prefixes[message.guild.id];
+    if (message.content.startsWith(prefix + 'setp')) {
+        if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.reply(`**:x: Error: You do not have the required permissions: Manage Server.**`)
+
+        let args = message.content.split(" ").slice(1)
+
+        if (!args.join(" ")) return message.reply(`**:x: Error: Say The Prefix Please.**`)
+
+        message.channel.send(`The New Prefix Set To ${args.join(" ")} !`)
+        setp.prefix = args.join()
+
+    }
+
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
+});
+
+client.on('message', message => {
+    if (message.content.startsWith(prefix + "test")) {
+
+        let args = message.content.split(" ").slice(1),
+            text = args.join(' ').replace('$userid', message.author.id).replace('server-name', message.guild.name);
+        message.channel.send(text)
+    }
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 client.login(process.env.BOT_TOKEN);
