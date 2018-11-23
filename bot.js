@@ -1230,7 +1230,7 @@ client.on('message', message => {
             if (logs[message.guild.id].onoff === 'On') return [message.channel.send(`**The logs channel feature has been deactivated**`), logs[message.guild.id].onoff = 'Off'];
         }
         if (state.trim().toLowerCase() == 'setchannel') {
-            let newChannel = message.content.split(" ").slice(2).join(" ");
+            let newChannel = message.guild.channels.filter(r=>r.name.toLowerCase().indexOf(args)>-1).first();
             if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}logs setchannel [channel_name]**`);
             if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`);
             logs[message.guild.id].channel = newChannel;
@@ -1248,12 +1248,12 @@ client.on('message', message => {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //say Command
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
     var prefix = prefixes[message.guild.id].prefix;
-	if (!message.channel.guild) return;
-	if (message.author.bot) return;
 	 let args = message.content.split(" ").slice(1),
 	text = args.join(' ').replace('$userid', message.author.id).replace('server-name', message.guild.name);
     if (message.content.startsWith(prefix + "say")) {
@@ -1267,12 +1267,12 @@ client.on('message', message => {
 });
 // Ping and status command's
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
     var prefix = prefixes[message.guild.id].prefix;
-    if (!message.channel.guild) return;
-    if (message.author.bot) return;
     if (message.content.startsWith(prefix + `ping`)) {
         return message.channel.send(`Ping : ${Date.now() - message.createdTimestamp}.`);
     }
@@ -1344,6 +1344,8 @@ Uptime : **[ ${days}:${hours}:${minutes}:${seconds}. ]**
 });
 // Avatar Command
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
@@ -1356,8 +1358,6 @@ client.on('message', message => {
       } else {
           member = message.author
       }
-	 if(!message.channel.guild) return;
- 	 if(message.author.bot) return;
 	const embed = new Discord.RichEmbed();
 	    embed.setThumbnail(client.user.avatarURL);
         embed.setAuthor(member.username);
@@ -1371,15 +1371,15 @@ client.on('message', message => {
     });
 	}
 });
-// Seve-icon Command
+// Server-icon Command
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
     var prefix = prefixes[message.guild.id].prefix;
 	if (message.content.startsWith(prefix + 'server-icon')) {
-	if(!message.channel.guild) return;
- 	if(message.author.bot) return;
  		const embed = new Discord.RichEmbed();
 	    embed.setThumbnail(client.user.avatarURL);
         embed.setAuthor(message.author.username);
@@ -1395,11 +1395,12 @@ client.on('message', message => {
 });
 // Members Command
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
 	    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
     var prefix = prefixes[message.guild.id].prefix;
-		if(!message.channel.guild) return;	
 		if (message.content.startsWith(prefix + 'members')) {
 		const embed = new Discord.RichEmbed();
 		embed.setThumbnail(client.user.avatarURL);
@@ -1409,13 +1410,15 @@ client.on('message', message => {
         embed.setTimestamp();
         embed.setFooter(message.guild.name , message.guild.iconURL);
 		message.channel.send(embed);
-		                    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+		fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err)
     });
 		}
 });
 // invites Command
 client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
@@ -1434,6 +1437,26 @@ client.on('message', message => {
     fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err);
     });
+});
+// inrole Command
+client.on("message", message => {
+    if(message.content.startsWith(prefix+"inrole")){ 
+        let roleName = message.content.split(" ").slice(1).join(" ").toLowerCase(); 
+        let role = message.guild.roles.filter(r=>r.name.toLowerCase().indexOf(roleName)>-1).first();
+        if( !role ) return message.reply(`**:x: I can't find the role .**`);
+        let mem = "";
+        let members = message.guild.members.filter( member => member.roles.get(role.id) ).forEach(m=>mem+=m.displayName+"\n");
+        if( mem == "" ){
+            mem = "No one's have this role.";
+        }
+        let embed = new Discord.RichEmbed({
+            "title": `The people how have ${role.name} role.`, 
+            "description": mem, 
+            "color": role.color 
+        }); 
+        return message.channel.send({embed});
+        
+    }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
