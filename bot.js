@@ -13,6 +13,7 @@ var report = JSON.parse(fs.readFileSync(`./Database/report.json`, `utf8`));
 let prefixes = JSON.parse(fs.readFileSync("./Database/prefix.json", "utf8"));
 var r = JSON.parse(fs.readFileSync('./Database/rchannel.json'));
 var uc = JSON.parse(fs.readFileSync('./Database/uchannel.json'));
+let logs = JSON.parse(fs.readFileSync('./Database/modlogs.json'));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
@@ -88,13 +89,19 @@ client.on('message', message => {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Message Logs
 client.on('messageDelete', message => {
-
+    if (!logs[message.guild.id]) logs[message.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[message.guild.id].channel;
+    if(logs[message.guild.id].onoff === 'Off') return;
+    const logChannel = message.guild.channels.find("name", name);
+	if (logs[message.guild.id].onoff)
 	if(message.author.bot) return;
 	if(message.channel.type === 'dm') return;
 	if(!message.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!message.guild.member(client.user).hasPermission('MANAGE_MESSAGES')) return;
 
-	var logChannel = message.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	let messageDelete = new Discord.RichEmbed()
@@ -103,18 +110,27 @@ client.on('messageDelete', message => {
 	.setThumbnail(message.author.avatarURL)
 	.setDescription(`:wastebasket: Successfully \`\`DELETE\`\` **MESSAGE** In ${message.channel}\n\n**Channel:** \`\`${message.channel.name}\`\`\n**Sent By:** <@${message.author.id}>\n**Message:**\n\`\`\`${message}\`\`\``)
 	.setTimestamp()
-	.setFooter(message.guild.name, message.guild.iconURL)
+	.setFooter(message.guild.name, message.guild.iconURL);
 
 	logChannel.send(messageDelete);
+	    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 });
 client.on('messageUpdate', (oldMessage, newMessage) => {
-
+    if (!logs[oldMessage.guild.id]) logs[oldMessage] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[oldMessage.guild.id].channel;
+    if(logs[oldMessage.guild.id].onoff === 'Off') return;
+    const logChannel = oldMessage.guild.channels.find("name", name);
+    
 	if(oldMessage.author.bot) return;
 	if(!oldMessage.channel.type === 'dm') return;
 	if(!oldMessage.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!oldMessage.guild.member(client.user).hasPermission('MANAGE_MESSAGES')) return;
 
-	var logChannel = oldMessage.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	if(oldMessage.content.startsWith('https://')) return;
@@ -125,17 +141,26 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 	.setColor('BLUE')
 	.setDescription(`:wrench: Successfully \`\`EDIT\`\` **MESSAGE** In ${oldMessage.channel}\n\n**Channel:** \`\`${oldMessage.channel.name}\`\`\n\n**Sent By:** <@${oldMessage.author.id}>\n\n**Old Message:**\`\`\`${oldMessage}\`\`\`\n**New Message:**\`\`\`${newMessage}\`\`\``)
 	.setTimestamp()
-	.setFooter(oldMessage.guild.name, oldMessage.guild.iconURL)
+	.setFooter(oldMessage.guild.name, oldMessage.guild.iconURL);
 
 	logChannel.send(messageUpdate);
+		    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 });
 // Roles Logs
 client.on('roleCreate', role => {
-
+    if (!logs[role.guild.id]) logs[role.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[role.guild.id].channel;
+    if(logs[role.guild.id].onoff === 'Off') return;
+    const logChannel = role.guild.channels.find("name", name);
+    
 	if(!role.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!role.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = role.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	role.guild.fetchAuditLogs().then(logs => {
@@ -148,17 +173,25 @@ client.on('roleCreate', role => {
 		.setDescription(`:white_check_mark: Successfully \`\`CREATE\`\` Role.\n\n**Role Name:** \`\`${role.name}\`\`\n**By:** <@${userID}>`)
 		.setColor('GREEN')
 		.setTimestamp()
-		.setFooter(role.guild.name, role.guild.iconURL)
+		.setFooter(role.guild.name, role.guild.iconURL);
 
 		logChannel.send(roleCreate);
-	})
+			    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
+	});
 });
 client.on('roleDelete', role => {
-
+    if (!logs[role.guild.id]) logs[role.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[role.guild.id].channel;
+    if(logs[role.guild.id].onoff === 'Off') return;
+    const logChannel = role.guild.channels.find("name", name);
 	if(!role.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!role.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = role.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	role.guild.fetchAuditLogs().then(logs => {
@@ -171,17 +204,26 @@ client.on('roleDelete', role => {
 		.setDescription(`:white_check_mark: Successfully \`\`DELETE\`\` Role.\n\n**Role Name:** \`\`${role.name}\`\`\n**By:** <@${userID}>`)
 		.setColor('RED')
 		.setTimestamp()
-		.setFooter(role.guild.name, role.guild.iconURL)
+		.setFooter(role.guild.name, role.guild.iconURL);
 
 		logChannel.send(roleDelete);
-	})
+			    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
+	});
 });
 client.on('roleUpdate', (oldRole, newRole) => {
-
+    if (!logs[oldRole.guild.id]) logs[oldRole.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[oldRole.guild.id].channel;
+    if(logs[oldRole.guild.id].onoff === 'Off') return;
+    const logChannel = oldRole.guild.channels.find("name", name);
+    
 	if(!oldRole.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!oldRole.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = oldRole.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	oldRole.guild.fetchAuditLogs().then(logs => {
@@ -195,7 +237,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 			.setColor('RANDOM')
 			.setDescription(`**\n**:white_check_mark: Successfully \`\`EDITED\`\` Role Name.\n\n**Old Name:** \`\`${oldRole.name}\`\`\n**New Name:** \`\`${newRole.name}\`\`\n\n**By:** <@${userID}>`)
 			.setTimestamp()
-			.setFooter(oldRole.guild.name, oldRole.guild.iconURL)
+			.setFooter(oldRole.guild.name, oldRole.guild.iconURL);
 
 			logChannel.send(roleUpdateName);
 		}
@@ -216,18 +258,27 @@ client.on('roleUpdate', (oldRole, newRole) => {
 			.setColor('RANDOM')
 			.setDescription(`:white_check_mark: Successfully \`\`EDITED\`\` **${oldRole.name}** Role Color.\n\n**Old Color:** ${oldColor}\n**New Color:** ${newColor}\n\n**By:** <@${userID}>`)
 			.setTimestamp()
-			.setFooter(oldRole.guild.name, oldRole.guild.iconURL)
+			.setFooter(oldRole.guild.name, oldRole.guild.iconURL);
 
 			logChannel.send(roleUpdateColor);
+						    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 		}
-	})
+	});
 });
 // Channels Log
 client.on('channelDelete', channel => {
+    if (!logs[channel.guild.id]) logs[channel.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[channel.guild.id].channel;
+    if(logs[channel.guild.id].onoff === 'Off') return;
+    const logChannel = channel.guild.channels.find("name", name);
 	if(!channel.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!channel.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = channel.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	if(channel.type === 'text') {
@@ -250,16 +301,25 @@ client.on('channelDelete', channel => {
 		.setDescription(`:white_check_mark: Successfully \`\`DELETE\`\` **${roomType}** channel.\n\n**Channel Name:** \`\`${channel.name}\`\`\n**By:** <@${userID}>`)
 		.setColor('RED')
 		.setTimestamp()
-		.setFooter(channel.guild.name, channel.guild.iconURL)
+		.setFooter(channel.guild.name, channel.guild.iconURL);
 
 		logChannel.send(channelDelete);
-	})
+					    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
+	});
 });
 client.on('channelCreate', channel => {
+	    if (!logs[channel.guild.id]) logs[channel.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[channel.guild.id].channel;
+    if(logs[channel.guild.id].onoff === 'Off') return;
+    const logChannel = channel.guild.channels.find("name", name);
 	if(!channel.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!channel.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = channel.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	if(channel.type === 'text') {
@@ -282,16 +342,25 @@ client.on('channelCreate', channel => {
 		.setDescription(`:white_check_mark: Successfully \`\`CREATED\`\` **${roomType}** channel.\n\n**Channel Name:** \`\`${channel.name}\`\`\n**By:** <@${userID}>`)
 		.setColor('RED')
 		.setTimestamp()
-		.setFooter(channel.guild.name, channel.guild.iconURL)
+		.setFooter(channel.guild.name, channel.guild.iconURL);
 
 		logChannel.send(channelCreate);
+					    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 	})
 });
 client.on('channelUpdate', (oldChannel, newChannel) => {
+		    if (!logs[oldChannel.guild.id]) logs[oldChannel.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[oldChannel.guild.id].channel;
+    if(logs[oldChannel.guild.id].onoff === 'Off') return;
+    const logChannel = oldChannel.guild.channels.find("name", name);
 	if(!oldChannel.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!oldChannel.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = oldChannel.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	if(oldChannel.type === 'text') {
@@ -329,15 +398,24 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 			.setFooter(oldChannel.guild.name, oldChannel.guild.iconURL)
 
 			logChannel.send(newTopic);
+						    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 		}
 	})
 });
 // Guild Logs
 client.on('guildBanAdd', (guild, user) => {
+			    if (!logs[guild.id]) logs[guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[guild.id].channel;
+    if(logs[guild.id].onoff === 'Off') return;
+    const logChannel = guild.channels.find("name", name);
 	if(!guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	guild.fetchAuditLogs().then(logs => {
@@ -355,13 +433,22 @@ client.on('guildBanAdd', (guild, user) => {
 		.setFooter(guild.name, guild.iconURL)
 
 		logChannel.send(banInfo);
+					    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 	})
 });
 client.on('guildBanRemove', (guild, user) => {
+			    if (!logs[guild.id]) logs[guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[guild.id].channel;
+    if(logs[guild.id].onoff === 'Off') return;
+    const logChannel = guild.channels.find("name", name);
 	if(!guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	guild.fetchAuditLogs().then(logs => {
@@ -376,16 +463,25 @@ client.on('guildBanRemove', (guild, user) => {
 		.setColor('GREEN')
 		.setDescription(`:unlock: Successfully \`\`UNBANNED\`\` **${user.username}** From the server\n\n**User:** <@${user.id}>\n**By:** <@${userID}>`)
 		.setTimestamp()
-		.setFooter(guild.name, guild.iconURL)
+		.setFooter(guild.name, guild.iconURL);
 
 		logChannel.send(unBanInfo);
-	})
+					    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
+	});
 });
 client.on('guildUpdate', (oldGuild, newGuild) => {
+			    if (!logs[oldGuild.guild.id]) logs[oldGuild.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[oldGuild.guild.id].channel;
+    if(logs[oldGuild.guild.id].onoff === 'Off') return;
+    const logChannel = oldGuild.guild.channels.find("name", name);
 	if(!oldGuild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!oldGuild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
-	var logChannel = oldGuild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	oldGuild.fetchAuditLogs().then(logs => {
@@ -457,10 +553,19 @@ client.on('guildUpdate', (oldGuild, newGuild) => {
 
 			logChannel.send(verLog);
 		}
-	})
+	});
+				    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 });
 client.on('guildMemberUpdate', (oldMember, newMember) => {
-	var logChannel = oldMember.guild.channels.find(c => c.id === '511307891114770433');
+			    if (!logs[oldMember.guild.id]) logs[oldMember.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[oldMember.guild.id].channel;
+    if(logs[oldMember.guild.id].onoff === 'Off') return;
+    const logChannel = oldMember.guild.channels.find("name", name);
 	if(!logChannel) return;
 
 	oldMember.guild.fetchAuditLogs().then(logs => {
@@ -527,7 +632,11 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 		
 		logChannel.send(newOwner);
 	}
+				    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 });
+// Fake Account Ban. 
 /*client.on('guildMemberAdd', member => {
 	if(datediff(parseDate(moment(member.user.createdTimestamp).format('l')), parseDate(moment().format('l'))) < 1) {
 		//member.guild.member(member).ban({ reason: 'Fake account.' })
@@ -543,6 +652,14 @@ function datediff(first, second) {
 };*/
 // Voice Logs
 client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
+				    if (!logs[voiceOld.guild.id]) logs[voiceOld.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    let name = logs[voiceOld.guild.id].channel;
+    if(logs[voiceOld.guild.id].onoff === 'Off') return;
+    const logChannel = voiceOld.guild.channels.find("name", name);
+    
 	if(!voiceOld.guild.member(client.user).hasPermission('EMBED_LINKS')) return;
 	if(!voiceOld.guild.member(client.user).hasPermission('VIEW_AUDIT_LOG')) return;
 
@@ -551,7 +668,6 @@ client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
 	var serverDeafOld = voiceOld.serverDeaf;
 	var serverDeafNew = voiceNew.serverDeaf;
 
-	var logChannel = voiceOld.guild.channels.find(c => c.id === '511307891114770433');
 	if(!logChannel) return;
 
 	voiceOld.guild.fetchAuditLogs().then(logs => {
@@ -647,6 +763,9 @@ client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
 		.setFooter(voiceOld.user.tag, voiceOld.user.avatarURL)
 
 		logChannel.send(voiceLeave);
+					    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
 	}
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -966,11 +1085,11 @@ client.on("message", message => {
 
     }
 });
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////                          
 // Report Command
 client.on('message', message => {
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
-        prefix: '!',
+        prefix: 'h',
     }
     var prefix = prefixes[message.guild.id].prefix
     if (!message.channel.guild) return;
@@ -1022,7 +1141,7 @@ Reason : ${args[1]}**`)
 //Creport Command
 client.on('message', message => {
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
-        prefix: '!',
+        prefix: 'h',
     }
     var prefix = prefixes[message.guild.id].prefix
     if (!message.channel.guild) return;
@@ -1067,7 +1186,7 @@ client.on("message", message => {
     if (!message.channel.guild) return;
     if (message.author.bot) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
-        prefix: '!',
+        prefix: 'h',
     }
     var prefix = prefixes[message.guild.id].prefix
     var setp = prefixes[message.guild.id];
@@ -1087,20 +1206,61 @@ client.on("message", message => {
         if (err) console.error(err)
     });
 });
-//say Command
+// logs Command
 client.on('message', message => {
-    if (message.content.startsWith(prefix + "test")) {
-
-        let args = message.content.split(" ").slice(1),
-            text = args.join(' ').replace('$userid', message.author.id).replace('server-name', message.guild.name);
-        message.channel.send(text)
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
+    if (!message.channel.guild) return;
+    if (message.author.bot) return;
+    if (!logs[message.guild.id]) logs[message.guild.id] = {
+        channel: 'logs',
+        onoff: 'Off',
+    };
+    if (message.content.startsWith(prefix + 'logs')) {
+        if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.reply(`**:x: Error: You do not have the required permissions: Manage Server.**`);
+        if (!message.guild.member(client.user).hasPermission('MANAGE_GUILD')) return message.reply('**:x: Error: I dont have the required permissions : MANAGE_GUILD**').catch(console.error);
+        let args = message.content.split(" ").slice(1);
+        let state = args[0];
+        if (!args[0]) return message.reply(`**${prefix}logs toggle/setchannel [channel_name]**`);
+        if (!state.trim().toLowerCase() == 'toggle' || !state.trim().toLowerCase() == 'setchannel') return message.reply(`**Please type a right state, ${prefix}logs toggle/setchannel [channel_name]**`);
+        if (state.trim().toLowerCase() == 'toggle') {
+            if (logs[message.guild.id].onoff === 'Off') return [message.channel.send(`**The logs channel feature has been activated**`), logs[message.guild.id].onoff = 'On'];
+            if (logs[message.guild.id].onoff === 'On') return [message.channel.send(`**The logs channel feature has been deactivated**`), logs[message.guild.id].onoff = 'Off'];
+        }
+        if (state.trim().toLowerCase() == 'setchannel') {
+            let newChannel = message.content.split(" ").slice(2).join(" ");
+            if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}logs setchannel [channel_name]**`);
+            if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`);
+            logs[message.guild.id].channel = newChannel;
+            message.channel.send(`** The logs channel has been changed to :  #${newChannel} (Remmber to toggle logs command! by writing (${prefix}logs toggle) .)**`);
+        }
     }
+    fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
+        if (err) console.error(err);
+    });
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err);
+    });
+
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
+//say Command
+client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
+	 let args = message.content.split(" ").slice(1),
+	text = args.join(' ').replace('$userid', message.author.id).replace('server-name', message.guild.name);
+    if (message.content.startsWith(prefix + "say")) {
+	if(!args[0]) return message.channel.send(`Error: You have to write a message .`);
+        message.channel.send(text);
+    }
+});
 // Ping and status command's
 client.on('message', message => {
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
-        prefix: '!',
+        prefix: 'h',
     }
     var prefix = prefixes[message.guild.id].prefix
     if (!message.channel.guild) return;
@@ -1210,6 +1370,41 @@ client.on('message', message => {
         embed.setFooter(message.guild.name , message.guild.iconURL);
     message.channel.send(embed);
 }
+});
+// Members Command
+client.on('message', message => {
+		if(!message.channel.guild) return;	
+		if (message.content.startsWith(prefix + 'members')) {
+		const embed = new Discord.RichEmbed();
+		embed.setThumbnail(client.user.avatarURL);
+        embed.setAuthor(message.author.username);
+        embed.setColor('RANDOM');
+        embed.setDescription(`Members Count : ${message.guild.memberCount - message.guild.members.filter(m=>m.user.bot).size} (${message.guild.members.filter(m=>m.user.bot).size} bots) `);
+        embed.setTimestamp();
+        embed.setFooter(message.guild.name , message.guild.iconURL);
+		message.channel.send(embed);
+		}
+});
+// invites Command
+client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
+    let args = message.content.split(" ").slice(1);
+
+    if (message.content.startsWith(prefix + 'invites')) {
+        message.guild.fetchInvites().then(invs => {
+            let user = message.mentions.users.first() || message.author;
+            let member = client.guilds.get(message.guild.id).members.get(user.id);
+            let personalInvites = invs.filter(i => i.inviter.id === user.id);
+            let inviteCount = personalInvites.reduce((p, v) => v.uses + p, 0);
+            message.channel.send(`**${user} has ${inviteCount} invites.**`);
+        });
+    };
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err);
+    });
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
