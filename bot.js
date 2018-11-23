@@ -1248,6 +1248,10 @@ client.on('message', message => {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //say Command
 client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
 	if (!message.channel.guild) return;
 	if (message.author.bot) return;
 	 let args = message.content.split(" ").slice(1),
@@ -1255,14 +1259,18 @@ client.on('message', message => {
     if (message.content.startsWith(prefix + "say")) {
 	if(!args[0]) return message.channel.send(`Error: You have to write a message .`);
         message.channel.send(text);
+            fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
+
     }
 });
 // Ping and status command's
 client.on('message', message => {
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
-    }
-    var prefix = prefixes[message.guild.id].prefix
+    };
+    var prefix = prefixes[message.guild.id].prefix;
     if (!message.channel.guild) return;
     if (message.author.bot) return;
     if (message.content.startsWith(prefix + `ping`)) {
@@ -1336,6 +1344,10 @@ Uptime : **[ ${days}:${hours}:${minutes}:${seconds}. ]**
 });
 // Avatar Command
 client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
 	if (message.content.startsWith(prefix + 'avatar')) {
 	var mention = message.mentions.users.first();
     var member;
@@ -1354,10 +1366,17 @@ client.on('message', message => {
         embed.setTimestamp();
         embed.setFooter(message.guild.name , message.guild.iconURL);
     message.channel.send(embed);
+                fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
 	}
 });
 // Seve-icon Command
 client.on('message', message => {
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
 	if (message.content.startsWith(prefix + 'server-icon')) {
 	if(!message.channel.guild) return;
  	if(message.author.bot) return;
@@ -1369,10 +1388,17 @@ client.on('message', message => {
         embed.setTimestamp();
         embed.setFooter(message.guild.name , message.guild.iconURL);
     message.channel.send(embed);
+                    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
 }
 });
 // Members Command
 client.on('message', message => {
+	    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
 		if(!message.channel.guild) return;	
 		if (message.content.startsWith(prefix + 'members')) {
 		const embed = new Discord.RichEmbed();
@@ -1383,6 +1409,9 @@ client.on('message', message => {
         embed.setTimestamp();
         embed.setFooter(message.guild.name , message.guild.iconURL);
 		message.channel.send(embed);
+		                    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err)
+    });
 		}
 });
 // invites Command
