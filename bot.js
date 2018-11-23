@@ -1234,7 +1234,7 @@ client.on('message', message => {
             if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}logs setchannel [channel_name]**`);
             if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`);
             logs[message.guild.id].channel = newChannel;
-            message.channel.send(`** The logs channel has been changed to :  #${newChannel} (Remmber to toggle logs command! by writing (${prefix}logs toggle) .)**`);
+            message.channel.send(`** The logs channel has been changed to :  #${newChannel} (Remember to toggle logs command! by writing (${prefix}logs toggle) .)**`);
         }
     }
     fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
