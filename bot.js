@@ -78,17 +78,9 @@ client.on("guildMemberAdd", (member) => {
     })
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
-client.on('message', message => {
-    if(!message.channel.guild) return;
-    if (message.author.bot) return;
-    if(message.content.startsWith(prefix + "ping")) {
-    message.delete(3000);
-    message.channel.sendMessage(`Ping : ${Date.now() - message.createdTimestamp}.`)
-    }
-});
-//////////////////////////////////////////////////////////////////////////////////////////////////
 // Message Logs
 client.on('messageDelete', message => {
+	if (!message.channel.guild) return;
     if (!logs[message.guild.id]) logs[message.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -118,6 +110,8 @@ client.on('messageDelete', message => {
     });
 });
 client.on('messageUpdate', (oldMessage, newMessage) => {
+	if (!oldMessage.channel.guild) return;
+
     if (!logs[oldMessage.guild.id]) logs[oldMessage] = {
         channel: 'logs',
         onoff: 'Off',
@@ -150,6 +144,8 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 });
 // Roles Logs
 client.on('roleCreate', role => {
+	if (!role.channel.guild) return;
+
     if (!logs[role.guild.id]) logs[role.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -182,6 +178,8 @@ client.on('roleCreate', role => {
 	});
 });
 client.on('roleDelete', role => {
+		if (!role.channel.guild) return;
+
     if (!logs[role.guild.id]) logs[role.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -213,6 +211,8 @@ client.on('roleDelete', role => {
 	});
 });
 client.on('roleUpdate', (oldRole, newRole) => {
+		if (!oldRole.channel.guild) return;
+
     if (!logs[oldRole.guild.id]) logs[oldRole.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -269,6 +269,8 @@ client.on('roleUpdate', (oldRole, newRole) => {
 });
 // Channels Log
 client.on('channelDelete', channel => {
+		if (!channel.guild) return;
+
     if (!logs[channel.guild.id]) logs[channel.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -310,6 +312,8 @@ client.on('channelDelete', channel => {
 	});
 });
 client.on('channelCreate', channel => {
+		if (!channel.guild) return;
+
 	    if (!logs[channel.guild.id]) logs[channel.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -351,6 +355,8 @@ client.on('channelCreate', channel => {
 	})
 });
 client.on('channelUpdate', (oldChannel, newChannel) => {
+		if (!oldChannel.channel.guild) return;
+
 		    if (!logs[oldChannel.guild.id]) logs[oldChannel.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -406,6 +412,8 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 });
 // Guild Logs
 client.on('guildBanAdd', (guild, user) => {
+		if (!guild.channel.guild) return;
+
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -439,6 +447,8 @@ client.on('guildBanAdd', (guild, user) => {
 	})
 });
 client.on('guildBanRemove', (guild, user) => {
+			if (!guild.channel.guild) return;
+
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -472,6 +482,8 @@ client.on('guildBanRemove', (guild, user) => {
 	});
 });
 client.on('guildUpdate', (oldGuild, newGuild) => {
+			if (!oldGuild.channel.guild) return;
+
 			    if (!logs[oldGuild.guild.id]) logs[oldGuild.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -559,6 +571,8 @@ client.on('guildUpdate', (oldGuild, newGuild) => {
     });
 });
 client.on('guildMemberUpdate', (oldMember, newMember) => {
+			if (!oldMember.channel.guild) return;
+
 			    if (!logs[oldMember.guild.id]) logs[oldMember.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -652,6 +666,8 @@ function datediff(first, second) {
 };*/
 // Voice Logs
 client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
+			if (!voiceOld.channel.guild) return;
+
 				    if (!logs[voiceOld.guild.id]) logs[voiceOld.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -768,331 +784,16 @@ client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
     });
 	}
 });
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//Games
-client.on("message", message => {
-    if (!message.channel.guild) return;
-
-    if (message.content.startsWith(prefix + '3wasm')) {
-
-        const type = require('./3wasm.json');
-        const item = type[Math.floor(Math.random() * type.length)];
-        const filter = response => {
-            return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
-        };
-        message.channel.send('**لديك 15 ثانية لتجيب**').then(msg => {
-
-            const embed = new Discord.RichEmbed()
-                .setColor("RANDOM")
-                .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-                .setThumbnail(message.author.avatarURL)
-                .addField(`**Human **`, ` **${item.type}**`)
-                .setFooter(`ستكسب 20 نقطة`)
-
-            msg.channel.send(embed).then(() => {
-                message.channel.awaitMessages(filter, {
-                        maxMatches: 1,
-                        time: 15000,
-                        errors: ['time']
-                    })
-                    .then((collected) => {
-                        message.channel.send(`**${collected.first().author} مبروك لقد كسبت 20 نقطة
-    لمعرفة نقاطك الرجاء كتابة !points**`);
-                        console.log(`[Typing] ${collected.first().author} typed the word.`);
-                        let userData = points[collected.first().author.id];
-                        userData.wins += 1
-                        userData.points += 20;
-
-                    })
-
-                    .catch(collected => {
-                        points[message.author.id].loses += 1;
-
-                        message.channel.send(`:x: **حظ اوفر المرة القادمة ! لقد خسرت , انتهى الوقت**`);
-                        console.log('[Typing] Error: No one type the word.');
-                    })
-            })
-        })
-        points[message.author.id].game += 1;
-
-
-    }
-    fs.writeFile("./points.json", JSON.stringify(points), function(err) {
-        if (err) console.log(err);
-    })
-
-    if (!points[message.author.id]) points[message.author.id] = {
-        points: 0,
-        wins: 0,
-        loses: 0,
-        game: 0,
-
-    };
-    if (message.author.bot) return;
-
-    if (!message.channel.guild) return;
-    let userData = points[message.author.id];
-
-    if (message.content.startsWith(prefix + 'points')) {
-        let pointss = userData.points
-        try {
-            pointss = shortNumber(pointss);
-        } catch (error) {
-            pointss = 0;
-        }
-        let wins = userData.wins
-        try {
-            wins = shortNumber(wins);
-        } catch (error) {
-            wins = 0;
-        }
-        let loses = userData.loses
-        try {
-            loses = shortNumber(loses);
-        } catch (error) {
-            loses = 0;
-        }
-        let games = userData.game
-        try {
-            games = shortNumber(games);
-        } catch (error) {
-            games = 0;
-        }
-        let embed = new Discord.RichEmbed()
-            .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-            .setColor('#000000')
-            .setDescription(`**Human
-    
-    :white_check_mark: Wins : ${wins}
-    :x: Loses: ${loses}
-    :label: Points: ${pointss}
-    :video_game: Games Played: ${games}**`);
-        message.channel.sendEmbed(embed)
-    }
-    fs.writeFile("./points.json", JSON.stringify(points), (err) => {
-        if (err) console.error(err)
-    })
-    if (message.author.bot) return;
-
-    if (!message.channel.guild) return;
-
-    if (!points[message.author.id]) points[message.author.id] = {
-        points: 0,
-        wins: 0,
-        loses: 0,
-        game: 0,
-    };
-    if (message.content.startsWith(prefix + 'fkk')) {
-
-        const type = require('./fkk.json');
-        const item = type[Math.floor(Math.random() * type.length)];
-        const filter = response => {
-            return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
-        };
-        message.channel.send('**لديك 10  ثواني لتجيب**').then(msg => {
-
-            const embed = new Discord.RichEmbed()
-                .setColor("RANDOM")
-                .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-                .setThumbnail(message.author.avatarURL)
-                .addField(`**Human**`, ` **${item.type}**`)
-                .setFooter(`ستكسب 10 نقاط `)
-
-            msg.channel.send(embed).then(() => {
-                message.channel.awaitMessages(filter, {
-                        maxMatches: 1,
-                        time: 10000,
-                        errors: ['time']
-                    })
-                    .then((collected) => {
-                        message.channel.send(`**${collected.first().author} مبروك لقد كسبت 10 نقاط
-    لمعرفة نقاطك الرجاء كتابة !points**`);
-
-                        console.log(`[Typing] ${collected.first().author} typed the word.`);
-                        let userData = points[collected.first().author.id];
-                        userData.wins += 1
-                        userData.points += 10;
-
-                    })
-
-                    .catch(collected => {
-                        points[message.author.id].loses += 1;
-
-                        message.channel.send(`:x: **حظ اوفر المرة القادمة ! لقد خسرت , انتهى الوقت**`);
-                        console.log('[Typing] Error: No one type the word.');
-
-                    })
-            })
-        })
-        points[message.author.id].game += 1;
-
-
-    }
-    fs.writeFile("./points.json", JSON.stringify(points), function(err) {
-        if (err) console.log(err);
-    })
-    if (message.author.bot) return;
-
-    if (!message.channel.guild) return;
-
-    if (!points[message.author.id]) points[message.author.id] = {
-        points: 0,
-        wins: 0,
-        loses: 0,
-        game: 0,
-
-    };
-    if (message.content.startsWith(prefix + 'a7sb')) {
-
-        const type = require('./a7sb.json');
-        const item = type[Math.floor(Math.random() * type.length)];
-        const filter = response => {
-            return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
-        };
-        message.channel.send('**لديك 15 ثانية لتجيب**').then(msg => {
-
-            const embed = new Discord.RichEmbed()
-                .setColor("RANDOM")
-                .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-                .setThumbnail(message.author.avatarURL)
-                .addField(`**Human**`, ` **${item.type}**`)
-                .setFooter(`ستكسب 5 نقاط`)
-
-            msg.channel.send(embed).then(() => {
-                message.channel.awaitMessages(filter, {
-                        maxMatches: 1,
-                        time: 15000,
-                        errors: ['time']
-                    })
-                    .then((collected) => {
-                        message.channel.send(`**${collected.first().author} مبروك لقد كسبت 5 نقاط
-    لمعرفة نقاطك الرجاء كتابة !points**`);
-                        console.log(`[Typing] ${collected.first().author} typed the word.`);
-                        let userData = points[collected.first().author.id];
-                        userData.wins += 1
-                        userData.points += 5;
-
-                    })
-
-                    .catch(collected => {
-                        points[message.author.id].loses += 1;
-
-                        message.channel.send(`:x: **حظ اوفر المرة القادمة ! لقد خسرت , انتهى الوقت**`);
-                        console.log('[Typing] Error: No one type the word.');
-                    })
-
-            })
-
-        })
-        points[message.author.id].game += 1;
-
-    }
-    fs.writeFile("./points.json", JSON.stringify(points), function(err) {
-        if (err) console.log(err);
-    })
-
-    if (message.author.bot) return;
-
-    if (!message.channel.guild) return;
-
-    if (!points[message.author.id]) points[message.author.id] = {
-        points: 0,
-        wins: 0,
-        loses: 0,
-        game: 0,
-
-    };
-    if (message.content.startsWith(prefix + '3lm')) {
-
-        const type = require('./a3lam.json');
-        const item = type[Math.floor(Math.random() * type.length)];
-        const filter = response => {
-            return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
-        };
-        message.channel.send('**لديك 15 ثانية لتجيب**').then(msg => {
-
-            const embed = new Discord.RichEmbed()
-                .setColor("RANDOM")
-                .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-                .setThumbnail(message.author.avatarURL)
-                .addField(`**Human**`, ` **${item.type}**`)
-                .setFooter(`ستكسب 15 نقطة`)
-
-            msg.channel.send(embed).then(() => {
-                message.channel.awaitMessages(filter, {
-                        maxMatches: 1,
-                        time: 15000,
-                        errors: ['time']
-                    })
-                    .then((collected) => {
-                        message.channel.send(`**${collected.first().author} مبروك لقد كسبت 15 نقطة 
-    لمعرفة نقاطك الرجاء كتابة !points**`);
-                        console.log(`[Typing] ${collected.first().author} typed the word.`);
-                        let userData = points[collected.first().author.id];
-                        userData.wins += 1
-                        userData.points += 15;
-
-                    })
-
-                    .catch(collected => {
-                        points[message.author.id].loses += 1;
-
-                        message.channel.send(`:x: **حظ اوفر المرة القادمة ! لقد خسرت , انتهى الوقت**`);
-                        console.log('[Typing] Error: No one type the word.');
-                    })
-            })
-
-        })
-        points[message.author.id].game += 1;
-
-    }
-    fs.writeFile("./points.json", JSON.stringify(points), function(err) {
-        if (err) console.log(err);
-    })
-
-    if (message.author.bot) return;
-
-
-    if (!message.channel.guild) return;
-
-    if (message.content.startsWith(prefix + 'helps')) {
-
-
-        const embed = new Discord.RichEmbed()
-            .setColor("RANDOM")
-            .setAuthor(`${message.author.tag}`, message.author.avatarURL)
-            .setThumbnail(message.author.avatarURL)
-            .setDescription(`
-    **
-    
-    Prefix = '${prefix}',
-    اوامر الالعاب,
-    
-    اول واحد يجاوب ياخذ النقاط,
-    
-    ${prefix}fkk - لتفكيك الكلمات -  10 نقاط,
-    ${prefix}a7sb - عمليات حسابية - 5 نقاط,
-    ${prefix}3lm - ما اسم الدولة - 15 نقطة ,
-    ${prefix}3wasm  - ما عاصمة الدولة  - 20 نقطة,
-    ${prefix}points - لمعرفة نقاطك;
-    -
-    اوامر عامة ,
-    ${prefix}ping - لمعرفة بنج البوت,
-    
-    **
-    `)
-        message.channel.send(embed)
-
-    }
-});
+//////////////////////////////////////////////////////////////////////////////////////////////////                          
 //////////////////////////////////////////////////////////////////////////////////////////////////                          
 // Report Command
 client.on('message', message => {
+	    if (!message.channel.guild) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     }
     var prefix = prefixes[message.guild.id].prefix
-    if (!message.channel.guild) return;
+        if (!message.channel.guild) return;
     let args = message.content.split(" ").slice(1);
 
     if (!r[message.guild.id]) r[message.guild.id] = {
@@ -1120,7 +821,7 @@ client.on('message', message => {
         embed.setDescription(`**The person mentioned: ${message.mentions.members.first()}
 By : ${message.member}
 Reason : ${args[1]}**`)
-        embed.setFooter(`Case number: ${reports.rcase+1}`)
+        embed.setFooter(`Case number: ${reports.rcase}`)
         if (message.guild.channels.find('name', creports.channel)) {
             message.guild.channels.find('name', creports.channel).send(embed);
         } else return message.reply(`noreply`);
@@ -1140,6 +841,7 @@ Reason : ${args[1]}**`)
 });
 //Creport Command
 client.on('message', message => {
+	    if (!message.channel.guild) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     }
@@ -1181,7 +883,7 @@ client.on('message', message => {
     });
 
 });
-//SetPrefix Command
+//SetPrefix Comتهmand
 client.on("message", message => {
     if (!message.channel.guild) return;
     if (message.author.bot) return;
@@ -1208,6 +910,7 @@ client.on("message", message => {
 });
 // logs Command
 client.on('message', message => {
+	    if (!message.channel.guild) return;
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
     };
@@ -1443,7 +1146,7 @@ client.on('message', message => {
     });
 });
 // bc Command
-/*client.on('message', message => {
+client.on('message', message => {
 	if (!message.channel.guild) return;
 	if (message.author.bot) return;
     let args = message.content.split(" ").slice(1);
@@ -1459,11 +1162,18 @@ client.on('message', message => {
     fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err);
     });
-});*/
+});
 // inrole Command
 client.on("message", message => {
-    if(message.content.startsWith(prefix+"inrole")){ 
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
+    if(message.content.startsWith(prefix + "inrole")) { 
         let roleName = message.content.split(" ").slice(1).join(" ").toLowerCase(); 
+        if(!roleName) return message.channel.send(`**${prefix}inrole [role_name]**`);
         let role = message.guild.roles.filter(r=>r.name.toLowerCase().indexOf(roleName)>-1).first();
         if( !role ) return message.reply(`**:x: I can't find the role .**`);
         let mem = "";
@@ -1476,9 +1186,57 @@ client.on("message", message => {
             "description": mem, 
             "color": role.color 
         }); 
-        return message.channel.send({embed});
-        
+        message.channel.send({embed});
+            fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err);
+    });
     }
+});
+// invite Command
+client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;	
+        if (message.content.startsWith(prefix + 'invite')) {
+    const invite = message.channel.createInvite({
+        thing: true,
+        maxUses: 2,
+        maxAge: 86400
+    }).then(invite =>
+    message.author.send(`**This is your invite: ${invite.url} \n this invite only 24 hours and you can invite 2 people's only!**`)
+    )
+    message.channel.send(`**This invite for 24 hours and you can invite 2 people's only, See your Dm**`);
+        }    
+        fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err);
+    });
+});
+client.on("message", async message => {
+            if(!message.channel.guild) return;
+        if(message.content.startsWith(prefix + 'invites')) {
+        var nul = 0
+        var guild = message.guild
+        await guild.fetchInvites()
+            .then(invites => {
+             invites.forEach(invite => {
+                if (invite.inviter === message.author) {
+                     nul+=invite.uses
+                    }
+                });
+            });
+          if (nul > 0) {
+              console.log(`\n${message.author.tag} has ${nul} invites in ${guild.name}\n`)
+                          message.channel.send(`${message.author.username}`, `لقد قمت بدعوة **${nul}** شخص`);
+                      return;
+                    } else {
+                   
+                       message.channel.send(`${message.author.username} لم تقم بدعوة أي شخص لهذة السيرفر`)
+                        return;
+                    }
+        }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
