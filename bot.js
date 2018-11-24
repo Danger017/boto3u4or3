@@ -1200,20 +1200,22 @@ client.on('message', message => {
         prefix: 'h',
     };
     var prefix = prefixes[message.guild.id].prefix;	
-        if (message.content.startsWith(prefix + 'invite')) {
+        if (message.content.startsWith(prefix + 'رابط')) {
     const invite = message.channel.createInvite({
         thing: true,
         maxUses: 2,
         maxAge: 86400
     }).then(invite =>
-    message.author.send(`**This is your invite: ${invite.url} \n this invite only 24 hours and you can invite 2 people's only!**`)
+    message.author.send(`**This is your invite: ${invite.url} \n this invite only 24 hours and you can invite 2 people's only!**`),
+    
+    message.channel.send(`**This invite for 24 hours and you can invite 2 people's only, See your Dm**`)
     )
-    message.channel.send(`**This invite for 24 hours and you can invite 2 people's only, See your Dm**`);
         }    
         fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err);
     });
 });
+// invites command
 client.on("message", async message => {
             if(!message.channel.guild) return;
         if(message.content.startsWith(prefix + 'invites')) {
