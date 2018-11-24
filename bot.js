@@ -1230,11 +1230,15 @@ client.on('message', message => {
             if (logs[message.guild.id].onoff === 'On') return [message.channel.send(`**The logs channel feature has been deactivated**`), logs[message.guild.id].onoff = 'Off'];
         }
         if (state.trim().toLowerCase() == 'setchannel') {
-            let newChannel = message.guild.channels.filter(r=>r.name.toLowerCase().indexOf(args)>-1).first();
+            let newChannel = message.content.split(" ").slice(2).join(" ")
+
             if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}logs setchannel [channel_name]**`);
             if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`);
             logs[message.guild.id].channel = newChannel;
-            message.channel.send(`** The logs channel has been changed to :  #${newChannel} (Remember to toggle logs command! by writing (${prefix}logs toggle) .)**`);
+           if(logs[message.guild.id].onoff === 'Off') return message.channel.send(`:x: Error: Logs channel property is disabled \n you activate the Feature by command: **${prefix}logs toggle** `);
+          message.channel.send(`** The logs channel has been changed to :  #${newChannel} **`);
+                       
+
         }
     }
     fs.writeFile("./Database/modlogs.json", JSON.stringify(logs), (err) => {
@@ -1438,6 +1442,24 @@ client.on('message', message => {
         if (err) console.error(err);
     });
 });
+// bc Command
+/*client.on('message', message => {
+	if (!message.channel.guild) return;
+	if (message.author.bot) return;
+    let args = message.content.split(" ").slice(1);
+    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
+        prefix: 'h',
+    };
+    var prefix = prefixes[message.guild.id].prefix;
+    if (message.content.startsWith(prefix + 'bc')) {
+	if(!args[0]) return message.channel.send(`Error: You have to write a message .`);
+	message.channel.send(`Sending message to ${message.guild.memberCount} members ..`);
+	message.author.sendMessage(`${args[0]}`)
+	}
+    fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
+        if (err) console.error(err);
+    });
+});*/
 // inrole Command
 client.on("message", message => {
     if(message.content.startsWith(prefix+"inrole")){ 
