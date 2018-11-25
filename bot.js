@@ -1148,12 +1148,9 @@ client.on('message', message => {
     });
 });
 // bc Command
-// bc Command
 client.on('message', message => {
 	if (!message.channel.guild) return;
 	if (message.author.bot) return;
-		var perms =message.author.hasPermission(`MANAGE_GUILD`);
-  if(!perms) return message.reply(`You don't have permissions, required permission's : Manage Roles , Manage server`)
     let args = message.content.split(" ").slice(1);
     if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
         prefix: 'h',
