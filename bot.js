@@ -396,11 +396,21 @@ const logChannel = oldChannel.guild.channels.find(channel => channel.name == nam
 			logChannel.send(newName);
 		}
 		if(oldChannel.topic !== newChannel.topic) {
+			if(newChannel.topic === null) {
+				var oldNM = '\`\`Nothingا\`\`';
+			}else {
+				var oldNM = newChannel.topic;
+			}
+			if(oldChannel.topic === null) {
+				var newNM = '\`\`Nothingا\`\`';
+			}else {
+				var newNM = oldChannel.topic;
+			}
 			let newTopic = new Discord.RichEmbed()
 			.setAuthor(oldChannel.guild.name)
 			.setThumbnail(userAvatar)
 			.setColor('RANDOM')
-			.setDescription(`:wrench: Successfully Edited **${channelType}** Channel Topic\n\n**Old Topic:**\n\`\`\`${oldChannel.topic || 'NULL'}\`\`\`\n**New Topic:**\n\`\`\`${newChannel.topic || 'NULL'}\`\`\`\n**Channel:** ${oldChannel}\n**By:** <@${userID}>`)
+			.setDescription(`:wrench: Successfully Edited **${channelType}** Channel Topic\n\n**Old Topic:**\n\`\`\`${oldNM}\`\`\`\n**New Topic:**\n\`\`\`${newNM}\`\`\`\n**Channel:** ${oldChannel}\n**By:** <@${userID}>`)
 			.setTimestamp()
 			.setFooter(oldChannel.guild.name, oldChannel.guild.iconURL)
 
