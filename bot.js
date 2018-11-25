@@ -1294,5 +1294,7 @@ if(message.content.startsWith(prefix + `autorole`)) {
 
 })
 //////////////////////////////////////////////////////////////////////////////////////////////////
+client.on("error", (e)=> console.log(e)); 
+
 
 client.login(process.env.BOT_TOKEN);
