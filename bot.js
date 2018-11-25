@@ -37,7 +37,7 @@ guild = client.guilds.find(guild => guild.name == 'Human')
 })
 client.on("guildMemberAdd", (member) => {
 
-	const channel = member.guild.channels.find(channel => channel.name == name);
+	const channel = member.guild.channels.find(channel => channel.name == 'welcome');
     if (!channel) {
         console.log("!channel fails");
         return;
