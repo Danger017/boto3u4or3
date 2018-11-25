@@ -826,7 +826,7 @@ Reason : ${args[1]}**`)
         embed.setFooter(`Case number: ${reports.rcase}`)
 
 	    if (message.guild.channels.find(channel => channel.name == creports.channel)) {
-            message.guild.channels.find(channel => channel.name == creports.channel)).send(embed);
+            message.guild.channels.find(channel => channel.name == creports.channel).send(embed);
         } else return message.reply(`noreply`);
     }
     fs.writeFile('./Database/report.json', JSON.stringify(report), (err) => {
