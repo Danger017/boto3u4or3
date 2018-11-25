@@ -81,6 +81,7 @@ client.on("guildMemberAdd", (member) => {
 // Message Logs
 client.on('messageDelete', message => {
 	if (!message.channel.guild) return;
+	if (message.author.bot) return;
     if (!logs[message.guild.id]) logs[message.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -111,7 +112,7 @@ client.on('messageDelete', message => {
 });
 client.on('messageUpdate', (oldMessage, newMessage) => {
 	if (!oldMessage.channel.guild) return;
-
+	if (oldMessage.author.bot) return;
     if (!logs[oldMessage.guild.id]) logs[oldMessage] = {
         channel: 'logs',
         onoff: 'Off',
@@ -144,7 +145,7 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 });
 // Roles Logs
 client.on('roleCreate', role => {
-	if (!role.channel.guild) return;
+
 
     if (!logs[role.guild.id]) logs[role.guild.id] = {
         channel: 'logs',
@@ -178,7 +179,7 @@ client.on('roleCreate', role => {
 	});
 });
 client.on('roleDelete', role => {
-		if (!role.channel.guild) return;
+
 
     if (!logs[role.guild.id]) logs[role.guild.id] = {
         channel: 'logs',
@@ -211,7 +212,6 @@ client.on('roleDelete', role => {
 	});
 });
 client.on('roleUpdate', (oldRole, newRole) => {
-		if (!oldRole.channel.guild) return;
 
     if (!logs[oldRole.guild.id]) logs[oldRole.guild.id] = {
         channel: 'logs',
@@ -269,7 +269,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 });
 // Channels Log
 client.on('channelDelete', channel => {
-		if (!channel.guild) return;
+	if (!channel.guild) return;
 
     if (!logs[channel.guild.id]) logs[channel.guild.id] = {
         channel: 'logs',
@@ -312,7 +312,7 @@ client.on('channelDelete', channel => {
 	});
 });
 client.on('channelCreate', channel => {
-		if (!channel.guild) return;
+	if (!channel.guild) return;
 
 	    if (!logs[channel.guild.id]) logs[channel.guild.id] = {
         channel: 'logs',
@@ -355,7 +355,8 @@ client.on('channelCreate', channel => {
 	})
 });
 client.on('channelUpdate', (oldChannel, newChannel) => {
-		if (!oldChannel.channel.guild) return;
+	if (!oldChannel.channel.guild) return;
+	if (oldChannel.author.bot) return;
 
 		    if (!logs[oldChannel.guild.id]) logs[oldChannel.guild.id] = {
         channel: 'logs',
@@ -412,7 +413,8 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 });
 // Guild Logs
 client.on('guildBanAdd', (guild, user) => {
-		if (!guild.channel.guild) return;
+	if (!guild.channel.guild) return;
+	if (guild.author.bot) return;
 
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
@@ -447,7 +449,8 @@ client.on('guildBanAdd', (guild, user) => {
 	})
 });
 client.on('guildBanRemove', (guild, user) => {
-			if (!guild.channel.guild) return;
+	if (!guild.channel.guild) return;
+	if (guild.author.bot) return;
 
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
@@ -482,7 +485,8 @@ client.on('guildBanRemove', (guild, user) => {
 	});
 });
 client.on('guildUpdate', (oldGuild, newGuild) => {
-			if (!oldGuild.channel.guild) return;
+	if (!oldGuild.channel.guild) return;
+	if (oldGuild.author.bot) return;
 
 			    if (!logs[oldGuild.guild.id]) logs[oldGuild.guild.id] = {
         channel: 'logs',
@@ -571,8 +575,6 @@ client.on('guildUpdate', (oldGuild, newGuild) => {
     });
 });
 client.on('guildMemberUpdate', (oldMember, newMember) => {
-			if (!oldMember.channel.guild) return;
-
 			    if (!logs[oldMember.guild.id]) logs[oldMember.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
@@ -666,7 +668,8 @@ function datediff(first, second) {
 };*/
 // Voice Logs
 client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
-			if (!voiceOld.channel.guild) return;
+	if (!voiceOld.channel.guild) return;
+	if (voiceOld.author.bot) return;
 
 				    if (!logs[voiceOld.guild.id]) logs[voiceOld.guild.id] = {
         channel: 'logs',
@@ -784,7 +787,6 @@ client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
     });
 	}
 });
-//////////////////////////////////////////////////////////////////////////////////////////////////                          
 //////////////////////////////////////////////////////////////////////////////////////////////////                          
 // Report Command
 client.on('message', message => {
@@ -934,7 +936,6 @@ client.on('message', message => {
         }
         if (state.trim().toLowerCase() == 'setchannel') {
             let newChannel = message.content.split(" ").slice(2).join(" ")
-
             if (!newChannel) return message.reply(`**:x: Error: Type the name of the channel ${prefix}logs setchannel [channel_name]**`);
             if (!message.guild.channels.find(`name`, newChannel)) return message.reply(`**:x: Error: I can not find the channel**`);
             logs[message.guild.id].channel = newChannel;
@@ -1240,6 +1241,59 @@ client.on("message", async message => {
                     }
         }
 });
+//////////////////////////////////////////////////////////////////////////////////////////////////
+client.on('guildMemberAdd', member => {
+  if(!ar[member.guild.id]) ar[member.guild.id] = {
+  onoff: 'Off',
+  role: 'Member'
+  };
+  if(ar[member.guild.id].onoff === 'Off') return;
+member.addRole(member.guild.roles.find(`name`, ar[member.guild.id].role)).catch(console.error);
+
+    fs.writeFile("./Database/autorole.json", JSON.stringify(ar), (err) => {
+    if (err) console.error(err);
+  });
+});
+// Autorole Command
+client.on('message', message => { 
+  var whitelisted = "455331653309562910"
+  var sender = message.author
+
+if(!message.channel.guild) return;
+  if(!ar[message.guild.id]) ar[message.guild.id] = {
+  onoff: 'Off',
+  role: 'Member'
+  }
+
+if(message.content.startsWith(prefix + `autorole`)) {
+         if(whitelisted.includes(sender.id)) {
+  let perms = message.member.hasPermission(`MANAGE_ROLES`)
+
+  if(!perms) return message.reply(`You don't have permissions, required permission : Manage Roles.`)
+  let args = message.content.split(" ").slice(1)
+  if(!args.join(" ")) return message.reply(`${prefix}autorle toggle/setrole [ROLE NAME]`)
+  let state = args[0]
+  if(!state.trim().toLowerCase() == 'toggle' || !state.trim().toLowerCase() == 'setrole') return message.reply(`Please type a right state, ${prefix}modlogs toggle/setrole [ROLE NAME]`) 
+    if(state.trim().toLowerCase() == 'toggle') { 
+     if(ar[message.guild.id].onoff === 'Off') return [message.channel.send(`**The Autorole event has been toggled to on!**`), ar[message.guild.id].onoff = 'On']
+     if(ar[message.guild.id].onoff === 'On') return [message.channel.send(`**The Autorole event has been toggled to Off!**`), ar[message.guild.id].onoff = 'Off']
+    }
+   if(state.trim().toLowerCase() == 'setrole') {
+   let newRole = message.content.split(" ").slice(2).join(" ");
+   if(!newRole) return message.reply(`${prefix}autorole setrole [ROLE NAME]`)
+     if(!message.guild.roles.find(`name`,newRole)) return message.reply(`I can't find this role.`)
+    ar[message.guild.id].role = newRole
+     message.channel.send(`**The Autorole role has been changed to ${newRole}.**`)
+   } 
+         }
+  }
+
+    fs.writeFile("./Database/autorole.json", JSON.stringify(ar), (err) => {
+    if (err) console.error(err)
+  });
+
+
+})
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 client.login(process.env.BOT_TOKEN);
