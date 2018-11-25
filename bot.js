@@ -1298,6 +1298,28 @@ if(message.content.startsWith(prefix + `autorole`)) {
 })
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on("error", (e)=> console.log(e)); 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//Join[Human]
+client.on('guildCreate', guild => {
+    guild.channels.first().createInvite({
+        thing: true,
+        maxUses: '100',
+        maxAge: '86400'
+    }).then(invite => {
 
-
+        client.channels.get("516366346120855552").send(`**Human has been joined to server , Name: [ ${guild.name} ]
+Owner: [ <@!${guild.owner.id}> ]
+Members/Bots : [ ${guild.memberCount - guild.members.filter(m=>m.user.bot).size} (${guild.members.filter(m=>m.user.bot).size-1}) ]
+Invite: [ ${invite.url} ]
+**`)
+    })
+});
+//Leave[Human]
+client.on("guildDelete", guild => {
+    client.channels.get("516366346120855552").send(`**Human has been removed from server , Name: [ ${guild.name} ]
+Owner: [ <@!${guild.owner.id}> ]
+Members/Bots : [ ${guild.memberCount - guild.members.filter(m=>m.user.bot).size} (${guild.members.filter(m=>m.user.bot).size-1}) ]
+**`)
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.BOT_TOKEN);
