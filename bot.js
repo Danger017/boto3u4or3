@@ -14,6 +14,7 @@ let prefixes = JSON.parse(fs.readFileSync("./Database/prefix.json", "utf8"));
 var r = JSON.parse(fs.readFileSync('./Database/rchannel.json'));
 var uc = JSON.parse(fs.readFileSync('./Database/uchannel.json'));
 let logs = JSON.parse(fs.readFileSync('./Database/modlogs.json'));
+let ar = JSON.parse(fs.readFileSync(`./Database/autorole.json`, `utf8`));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
