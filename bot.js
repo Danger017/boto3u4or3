@@ -356,8 +356,6 @@ client.on('channelCreate', channel => {
 	})
 });
 client.on('channelUpdate', (oldChannel, newChannel) => {
-	if (!oldChannel.channel.guild) return;
-	if (oldChannel.author.bot) return;
 
 		    if (!logs[oldChannel.guild.id]) logs[oldChannel.guild.id] = {
         channel: 'logs',
