@@ -25,7 +25,7 @@ client.user.setActivity('Human .. Online', {type:'idle' });
 client.on("ready", () => {
     var guild;
     while (!guild)
-        guild = client.guilds.find("name", 'Fucck Off..')
+        guild = client.guilds.find("name", 'Human')
     guild.fetchInvites().then((data) => {
         data.forEach((Invite, key, map) => {
             var Inv = Invite.code;
@@ -46,7 +46,7 @@ client.on("guildMemberAdd", (member) => {
     }
     var guild;
     while (!guild)
-        guild = client.guilds.find("name", 'Fucck Off..')
+        guild = client.guilds.find("name", 'Human')
     guild.fetchInvites().then((data) => {
         data.forEach((Invite, key, map) => {
             var Inv = Invite.code;
