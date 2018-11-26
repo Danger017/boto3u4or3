@@ -18,7 +18,8 @@ let ar = JSON.parse(fs.readFileSync(`./Database/autorole.json`, `utf8`));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 client.on('ready' , () => {
     console.log('Human .. Online.');
-client.user.setActivity('Human .. Online', {type:'idle' });
+	client.user.setActivity('Human .. Online', {type:'WATCHING'});
+  client.user.setStatus("idle")
 
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
