@@ -1171,7 +1171,7 @@ client.on('message', message => {
 	message.channel.send(`Sending message to ${message.guild.memberCount} members ..`);
             message.guild.members.forEach(m => {
 	message.send(`${args[0]}`)
-	    }
+	    });
 	}
     fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err);
