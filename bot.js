@@ -1169,7 +1169,9 @@ client.on('message', message => {
     if (message.content.startsWith(prefix + 'bc')) {
 	if(!args[0]) return message.channel.send(`Error: You have to write a message .`);
 	message.channel.send(`Sending message to ${message.guild.memberCount} members ..`);
-	message.author.sendMessage(`${args[0]}`)
+            message.guild.members.forEach(m => {
+	message.send(`${args[0]}`)
+	    }
 	}
     fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
         if (err) console.error(err);
