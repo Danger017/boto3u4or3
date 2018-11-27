@@ -679,8 +679,6 @@ function datediff(first, second) {
 };*/
 // Voice Logs
 client.on('voiceStateUpdate', (voiceOld, voiceNew) => {
-	if (!voiceOld.channel.guild) return;
-	if (voiceOld.author.bot) return;
 
 				    if (!logs[voiceOld.guild.id]) logs[voiceOld.guild.id] = {
         channel: 'logs',
