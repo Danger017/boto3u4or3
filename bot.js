@@ -491,9 +491,6 @@ const logChannel = guild.channels.find(channel => channel.name == name);
 	});
 });
 client.on('guildUpdate', (oldGuild, newGuild) => {
-	if (!oldGuild.channel.guild) return;
-	if (oldGuild.author.bot) return;
-
 			    if (!logs[oldGuild.guild.id]) logs[oldGuild.guild.id] = {
         channel: 'logs',
         onoff: 'Off',
