@@ -424,8 +424,6 @@ const logChannel = oldChannel.guild.channels.find(channel => channel.name == nam
 });
 // Guild Logs
 client.on('guildBanAdd', (guild, user) => {
-	if (!guild.channel.guild) return;
-	if (guild.author.bot) return;
 
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
@@ -460,9 +458,6 @@ const logChannel = guild.channels.find(channel => channel.name == name);
 	})
 });
 client.on('guildBanRemove', (guild, user) => {
-	if (!guild.channel.guild) return;
-	if (guild.author.bot) return;
-
 			    if (!logs[guild.id]) logs[guild.id] = {
         channel: 'logs',
         onoff: 'Off',
