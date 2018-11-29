@@ -1104,28 +1104,6 @@ client.on('message', message => {
     });
 }
 });
-// Members Command
-client.on('message', message => {
-	if (!message.channel.guild) return;
-	if (message.author.bot) return;
-	    if (!prefixes[message.guild.id]) prefixes[message.guild.id] = {
-        prefix: 'h',
-    };
-    var prefix = prefixes[message.guild.id].prefix;
-		if (message.content.startsWith(prefix + 'members')) {
-		const embed = new Discord.RichEmbed();
-		embed.setThumbnail(client.user.avatarURL);
-        embed.setAuthor(message.author.username);
-        embed.setColor('RANDOM');
-        embed.setDescription(`Members Count : ${message.guild.memberCount - message.guild.members.filter(m=>m.user.bot).size} (${message.guild.members.filter(m=>m.user.bot).size} bots) `);
-        embed.setTimestamp();
-        embed.setFooter(message.guild.name , message.guild.iconURL);
-		message.channel.send(embed);
-		fs.writeFile("./Database/prefix.json", JSON.stringify(prefixes), (err) => {
-        if (err) console.error(err)
-    });
-		}
-});
 // invites Command
 client.on('message', message => {
 	if (!message.channel.guild) return;
