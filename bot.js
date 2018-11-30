@@ -23,7 +23,7 @@ client.on('ready' , () => {
 
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 client.on("ready", () => {
     var guild;
     while (!guild)
@@ -79,7 +79,7 @@ guild = client.guilds.find(guild => guild.name == 'Human')
             dat[Inv] = Invite.uses;
         })
     })
-});
+});*/
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Message Logs
 client.on('messageDelete', message => {
